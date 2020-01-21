@@ -12,6 +12,9 @@ BWA_INDEX = config['BWA_INDEX']
 
 TARGETS = []
 
+## test
+
+
 ## constructe the target if the inputs are fastqs
 # ALL_FASTQC  = expand("02_fqc/{sample}_L001_R2_001_fastqc.html", sample = SAMPLES)
 
