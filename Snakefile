@@ -16,16 +16,16 @@ TARGETS = []
 
 
 ## constructe the target if the inputs are fastqs
-# ALL_FASTQC  = expand("02_fqc/{sample}_L001_R2_001_fastqc.html", sample = SAMPLES)
+ALL_FASTQC  = expand("02_fqc/{sample}_L001_R2_001_fastqc.html", sample = SAMPLES)
 
 bam = expand("03_aln/{sample}.sorted.bam", sample = SAMPLES)
 
-# ALL_QC = ["10multiQC/multiQC_log.html"]
+ALL_QC = ["10multiQC/multiQC_log.html"]
 peak = expand("06_peak_macs2_broad/{sample}_macs2_peaks.narrowPeak", sample = SAMPLES)
-flag = expand("03_aln/{sample}.sorted.bam.flagstat", sample = SAMPLES)
+flag = expand("00_log/{sample}.sorted.bam.flagstat", sample = SAMPLES)
 
 TARGETS.extend(bam) ##append all list to 
-# TARGETS.extend(ALL_FASTQC) ## check later
+TARGETS.extend(ALL_FASTQC) ## check later
 # TARGETS.extend(ALL_QC)
 TARGETS.extend(peak)
 TARGETS.extend(flag)
@@ -39,7 +39,7 @@ rule all:
 
 rule fastqc:
     input:
-        # r1 = lambda wildcards: FILES[wildcards.sample]['R1'],
+        r1 = lambda wildcards: FILES[wildcards.sample]['R1'],
         r2 = lambda wildcards: FILES[wildcards.sample]['R2']
     output: "02_fqc/{sample}_L001_R2_001_fastqc.html" 
     threads: 1
@@ -57,10 +57,10 @@ rule fastqc:
 
 rule bwa_align:
     input:
-        # r1 = lambda wildcards: FILES[wildcards.sample]['R1'],
+        r1 = lambda wildcards: FILES[wildcards.sample]['R1'],
         r2 = lambda wildcards: FILES[wildcards.sample]['R2']
     output: temp("03_aln/{sample}.sam")
-    threads: 48
+    threads: 24
     message: "bwa {input}: {threads} threads"
     log:
          "00_log/{sample}.bwa"
@@ -116,7 +116,7 @@ rule index_bam:
 # check number of reads mapped by samtools flagstat, the output will be used for downsampling
 rule flagstat_bam:
     input:  "03_aln/{sample}.sorted.bam"
-    output: "03_aln/{sample}.sorted.bam.flagstat"
+    output: "00_log/{sample}.sorted.bam.flagstat"
     log:    "00_log/{sample}.flagstat_bam"
     threads: 1
     params: jobname = "{sample}"
@@ -147,13 +147,13 @@ rule call_peaks_macs2_narrow:
 
 rule multiQC:
     input :
-        expand("03_aln/{sample}.sorted.bam.flagstat", sample = SAMPLES)
-        # expand("02_fqc/{sample}_L001_R2_001_fastqc.html", sample = SAMPLES)
+        expand("00_log/{sample}.sorted.bam.flagstat", sample = SAMPLES),
+        expand("02_fqc/{sample}_L001_R2_001_fastqc.html", sample = SAMPLES)
     output: "10multiQC/multiQC_log.html"
     log: "00log/multiqc.log"
     message: "multiqc for all logs"
     shell:
         """
-        multiqc 02_fqc 03_aln 00log -o 10multiQC -d -f -v -n multiQC_log 2> {log}
+        multiqc 02_fqc 00log -o 10multiQC -d -f -v -n multiQC_log 2> {log}
         """
 
