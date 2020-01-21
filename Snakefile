@@ -26,7 +26,7 @@ flag = expand("00_log/{sample}.sorted.bam.flagstat", sample = SAMPLES)
 
 TARGETS.extend(bam) ##append all list to 
 TARGETS.extend(ALL_FASTQC) ## check later
-# TARGETS.extend(ALL_QC)
+TARGETS.extend(ALL_QC)
 TARGETS.extend(peak)
 TARGETS.extend(flag)
 
@@ -154,6 +154,6 @@ rule multiQC:
     message: "multiqc for all logs"
     shell:
         """
-        multiqc 02_fqc 00log -o 10multiQC -d -f -v -n multiQC_log 2> {log}
+        multiqc 02_fqc 00_log -o 10multiQC -d -f -v -n multiQC_log 2> {log}
         """
 
