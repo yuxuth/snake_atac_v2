@@ -16,18 +16,18 @@ TARGETS = []
 
 
 ## constructe the target if the inputs are fastqs
-ALL_FASTQC  = expand("02_fqc/{sample}_L001_R2_001_fastqc.html", sample = SAMPLES)
+# ALL_FASTQC  = expand("02_fqc/{sample}_L001_R2_001_fastqc.html", sample = SAMPLES)
 
 bam = expand("03_aln/{sample}.sorted.bam", sample = SAMPLES)
 
-ALL_QC = ["10multiQC/multiQC_log.html"]
-peak = expand("06_peak_macs2_broad/{sample}_macs2_peaks.narrowPeak", sample = SAMPLES)
+# ALL_QC = ["10multiQC/multiQC_log.html"]
+# peak = expand("06_peak_macs2_broad/{sample}_macs2_peaks.narrowPeak", sample = SAMPLES)
 flag = expand("00_log/{sample}.sorted.bam.flagstat", sample = SAMPLES)
 
 TARGETS.extend(bam) ##append all list to 
-TARGETS.extend(ALL_FASTQC) ## check later
-TARGETS.extend(ALL_QC)
-TARGETS.extend(peak)
+# TARGETS.extend(ALL_FASTQC) ## check later
+# TARGETS.extend(ALL_QC)
+# TARGETS.extend(peak)
 TARGETS.extend(flag)
 
 
@@ -57,10 +57,10 @@ rule fastqc:
 
 rule bwa_align:
     input:
-        r1 = lambda wildcards: FILES[wildcards.sample]['R1'],
-        r2 = lambda wildcards: FILES[wildcards.sample]['R2']
+        r1 = lambda wildcards: FILES[wildcards.sample]['R1'] #,
+        # r2 = lambda wildcards: FILES[wildcards.sample]['R2']
     output: temp("03_aln/{sample}.sam")
-    threads: 24
+    threads: 6
     message: "bwa {input}: {threads} threads"
     log:
          "00_log/{sample}.bwa"
