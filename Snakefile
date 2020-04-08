@@ -95,7 +95,7 @@ rule sort_bam:
     input: ("03_aln/{sample}.tmp.bam")
     output: "03_aln/{sample}.sorted.bam"
     message: "samtools  sort {input} "
-    threads : 12
+    threads : 6
     shell:
         """
         module load samtools
