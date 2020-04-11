@@ -23,12 +23,10 @@ bam = expand("03_aln/{sample}.sorted.bam", sample = SAMPLES)
 # ALL_QC = ["10multiQC/multiQC_log.html"]
 # peak = expand("06_peak_macs2_broad/{sample}_macs2_peaks.narrowPeak", sample = SAMPLES)
 flag = expand("00_log/{sample}.sorted.bam.flagstat", sample = SAMPLES)
-
+bam_index = expand("03_aln/{sample}.sorted.bam.bai", sample = SAMPLES)
 TARGETS.extend(bam) ##append all list to 
-# TARGETS.extend(ALL_FASTQC) ## check later
-# TARGETS.extend(ALL_QC)
-# TARGETS.extend(peak)
 TARGETS.extend(flag)
+TARGETS.extend(bam_index)
 
 
 localrules: all
@@ -37,23 +35,7 @@ rule all:
     input: TARGETS
 
 
-rule fastqc:
-    input:
-        r1 = lambda wildcards: FILES[wildcards.sample]['R1'],
-        r2 = lambda wildcards: FILES[wildcards.sample]['R2']
-    output: "02_fqc/{sample}_L001_R2_001_fastqc.html" 
-    threads: 1
-    params : jobname = "{sample}"
-    message: "fastqc {input}: {threads}"
-    log:   "00_log/{sample}_fastqc"
-    shell:
-        """
-        module load fastqc
-        fastqc -o 02_fqc -f fastq --noextract {input}  2> {log}
-        """
 
-# get the duplicates marked sorted bam, remove unmapped reads by samtools view -F 4 and dupliated reads by samblaster -r
-# samblaster should run before samtools sort
 
 rule bwa_align:
     input:
@@ -127,33 +109,4 @@ rule flagstat_bam:
         samtools flagstat {input} > {output} 2> {log}
         """
 
-rule call_peaks_macs2_narrow:
-    input: "03_aln/{sample}.sorted.bam", "03_aln/{sample}.sorted.bam.bai"
-    output: bed = "06_peak_macs2_broad/{sample}_macs2_peaks.narrowPeak"  ## case control is defined by the output 
-    log: "00_log/{sample}_call_broad_peaks_macs2.log"
-    params:
-        name = "{sample}_macs2",
-        jobname = "{sample}"
-    message: "call_peaks macs2 narrow {input}: {threads} threads"
-    shell:
-        """
-       module load macs2
-       ## for macs2, when nomodel is set, --extsize is default to 200bp, this is the same as 2 * shift-size in macs14.
-        macs2 callpeak -t {input[0]} \
-            --keep-dup all -f BAM -g mm \
-            --outdir 06_peak_macs2_broad -n {params.name} -p 1e-5  -B --SPMR --nomodel &> {log}
-        """
-
-
-rule multiQC:
-    input :
-        expand("00_log/{sample}.sorted.bam.flagstat", sample = SAMPLES),
-        expand("02_fqc/{sample}_L001_R2_001_fastqc.html", sample = SAMPLES)
-    output: "10multiQC/multiQC_log.html"
-    log: "00log/multiqc.log"
-    message: "multiqc for all logs"
-    shell:
-        """
-        multiqc 02_fqc 00_log -o 10multiQC -d -f -v -n multiQC_log 2> {log}
-        """
 
