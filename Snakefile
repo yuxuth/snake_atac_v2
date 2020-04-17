@@ -72,11 +72,11 @@ rule trim_fastqs: ## merge fastq
         
 # get the duplicates marked sorted bam, remove unmapped reads by samtools view -F 4 and dupliated reads by samblaster -r
 # samblaster should run before samtools sort
-
-rule bwa_align:
+# mm for memory efficiency.  -X  fragment size limitation
+rule bowtie2_align:
     input:
-		"01_trim_seq/{sample}_1.fastq", 
-		"01_trim_seq/{sample}_2.fastq"
+        "01_trim_seq/{sample}_1.fastq", 
+        "01_trim_seq/{sample}_2.fastq"
     output: temp("03_aln/{sample}.sam")
     threads: 6
     message: "bwa {input}: {threads} threads"
@@ -87,7 +87,7 @@ rule bwa_align:
         module load bowtie2
         bowtie2 --mm -x {bowtie2_INDEX}  -X 2000 --threads {threads}  -1 {input[0]}  -2 {input[1]} > {output}  2> {log}
         """
-# mm for memory efficiency.  -X  fragment size limitation
+
 
 rule remove_duplicate:
     input:  "03_aln/{sample}.sam"
@@ -98,6 +98,7 @@ rule remove_duplicate:
         """
         samblaster --removeDups -i {input} -o {output} 2>  {log}
         """
+
 ## remove the unmapped reads 
 rule sam_to_bam:
     input:  ("03_aln/{sample}.duremovedsam")
