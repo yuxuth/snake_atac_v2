@@ -53,13 +53,30 @@ rule fastqc:
         fastqc -o 02_fqc -f fastq --noextract {input}  2> {log}
         """
 
+rule trim_fastqs: ## merge fastq
+	input:
+		r1 = lambda wildcards: FILES[wildcards.sample]['R1'],
+		r2 = lambda wildcards: FILES[wildcards.sample]['R2']
+	output:
+		("01_trim_seq/{sample}_1.fastq" ), ("01_trim_seq/{sample}_2.fastq")
+	log: "00_log/{sample}_trim_adapter.log"
+	params:
+		jobname = "{sample}"
+	threads : 8
+	# group: "mygroup"
+	message: "trim fastqs {input}: {threads} threads"
+	shell:
+		"""
+		NGmerge  -a -y  -n {threads} -1 {input[0]} -2 {input[1]}  -o 01_trim_seq/{params.jobname} 2> {log} 
+		"""
+        
 # get the duplicates marked sorted bam, remove unmapped reads by samtools view -F 4 and dupliated reads by samblaster -r
 # samblaster should run before samtools sort
 
 rule bwa_align:
     input:
-        r1 = lambda wildcards: FILES[wildcards.sample]['R1'],
-        r2 = lambda wildcards: FILES[wildcards.sample]['R2']
+		"01_trim_seq/{sample}_1.fastq", 
+		"01_trim_seq/{sample}_2.fastq"
     output: temp("03_aln/{sample}.sam")
     threads: 6
     message: "bwa {input}: {threads} threads"
