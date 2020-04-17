@@ -8,7 +8,8 @@ FILES = json.load(open(config['SAMPLES_JSON']))
 # CLUSTER = json.load(open(config['CLUSTER_JSON']))
 
 SAMPLES = sorted(FILES.keys())
-BWA_INDEX = config['BWA_INDEX']
+# BWA_INDEX = config['BWA_INDEX']
+bowtie2_INDEX = config['bowtie2_INDEX']
 
 TARGETS = []
 
@@ -25,9 +26,9 @@ peak = expand("06_peak_macs2_broad/{sample}_macs2_peaks.narrowPeak", sample = SA
 flag = expand("00_log/{sample}.sorted.bam.flagstat", sample = SAMPLES)
 
 TARGETS.extend(bam) ##append all list to 
-TARGETS.extend(ALL_FASTQC) ## check later
-TARGETS.extend(ALL_QC)
-TARGETS.extend(peak)
+# TARGETS.extend(ALL_FASTQC) ## check later
+# TARGETS.extend(ALL_QC)
+# TARGETS.extend(peak)
 TARGETS.extend(flag)
 
 
@@ -60,16 +61,16 @@ rule bwa_align:
         r1 = lambda wildcards: FILES[wildcards.sample]['R1'],
         r2 = lambda wildcards: FILES[wildcards.sample]['R2']
     output: temp("03_aln/{sample}.sam")
-    threads: 24
+    threads: 6
     message: "bwa {input}: {threads} threads"
     log:
-         "00_log/{sample}.bwa"
+         "00_log/{sample}.bowtie2"
     shell:
         """
-        module load bwa
-        bwa mem  -t {threads} {BWA_INDEX} {input}  > {output}  2> {log}
+        module load bowtie2
+        bowtie2 --mm -x {bowtie2_INDEX}  -X 2000 --threads {threads}  -1 {input[0]}  -2 {input[1]} > {output}  2> {log}
         """
-
+# mm for memory efficiency.  -X  fragment size limitation
 
 rule remove_duplicate:
     input:  "03_aln/{sample}.sam"
@@ -80,7 +81,7 @@ rule remove_duplicate:
         """
         samblaster --removeDups -i {input} -o {output} 2>  {log}
         """
-
+## remove the unmapped reads 
 rule sam_to_bam:
     input:  ("03_aln/{sample}.duremovedsam")
     output: temp( "03_aln/{sample}.tmp.bam")
@@ -88,7 +89,7 @@ rule sam_to_bam:
     shell:
         """
         module load samtools
-        samtools view -Sb -F 4 {input}  > {output}
+        samtools view -Sb -F 4  -q 30 {input}  > {output}
         """
 
 rule sort_bam:
@@ -127,33 +128,8 @@ rule flagstat_bam:
         samtools flagstat {input} > {output} 2> {log}
         """
 
-rule call_peaks_macs2_narrow:
-    input: "03_aln/{sample}.sorted.bam", "03_aln/{sample}.sorted.bam.bai"
-    output: bed = "06_peak_macs2_broad/{sample}_macs2_peaks.narrowPeak"  ## case control is defined by the output 
-    log: "00_log/{sample}_call_broad_peaks_macs2.log"
-    params:
-        name = "{sample}_macs2",
-        jobname = "{sample}"
-    message: "call_peaks macs2 narrow {input}: {threads} threads"
-    shell:
-        """
-       module load macs2
-       ## for macs2, when nomodel is set, --extsize is default to 200bp, this is the same as 2 * shift-size in macs14.
-        macs2 callpeak -t {input[0]} \
-            --keep-dup all -f BAM -g mm \
-            --outdir 06_peak_macs2_broad -n {params.name} -p 1e-5  -B --SPMR --nomodel &> {log}
-        """
 
 
-rule multiQC:
-    input :
-        expand("00_log/{sample}.sorted.bam.flagstat", sample = SAMPLES),
-        expand("02_fqc/{sample}_L001_R2_001_fastqc.html", sample = SAMPLES)
-    output: "10multiQC/multiQC_log.html"
-    log: "00log/multiqc.log"
-    message: "multiqc for all logs"
-    shell:
-        """
-        multiqc 02_fqc 00_log -o 10multiQC -d -f -v -n multiQC_log 2> {log}
-        """
+
+
 
