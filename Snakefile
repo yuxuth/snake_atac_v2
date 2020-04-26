@@ -34,7 +34,7 @@ index_r2 = expand("03_aln/{sample}_r2.sorted.bam.bai", sample = SAMPLES)
 TARGETS.extend(bam_r1) ##append all list to 
 TARGETS.extend(bam_r2)
 TARGETS.extend(ALL_FASTQC_R1) ## check later
-TARGETS.extend(ALL_QC)
+# TARGETS.extend(ALL_QC)
 TARGETS.extend(peak)
 TARGETS.extend(flag_r1)
 TARGETS.extend(flag_r2)
@@ -156,6 +156,27 @@ rule index_bam_r2:
         samtools index {input} 
         """
 
+rule flagstat_bam_r1:
+    input:  "03_aln/{sample}_r1.sorted.bam"
+    output: "00_log/{sample}_r1.sorted.bam.flagstat"
+    threads: 1
+    params: jobname = "{sample}"
+    message: "flagstat_bam {input}: {threads} threads"
+    shell:
+        """
+        samtools flagstat {input} > {output} 
+        """
+rule flagstat_bam_r2:
+    input:  "03_aln/{sample}_r2.sorted.bam"
+    output: "00_log/{sample}_r2.sorted.bam.flagstat"
+    threads: 1
+    params: jobname = "{sample}"
+    message: "flagstat_bam {input}: {threads} threads"
+    shell:
+        """
+        samtools flagstat {input} > {output} 
+        """
+	
 rule call_peaks_macs2_narrow: ## set to large
     input: "03_aln/{sample}_r1.sorted.bam", "03_aln/{sample}_r2.sorted.bam"
     output: bed = "06_peak_macs2_narrow/{sample}_macs2_peaks.narrowPeak",	
