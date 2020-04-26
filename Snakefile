@@ -119,7 +119,7 @@ rule sort_bam_r1:
     input: ("03_aln/{sample}_r1.bam")
     output: "03_aln/{sample}_r1.sorted.bam"
     message: "samtools  sort {input} "
-    threads : 16
+    threads : 6
     shell:
         """
         module load samtools
@@ -130,7 +130,7 @@ rule sort_bam_r2:
     input: ("03_aln/{sample}_r2.bam")
     output: "03_aln/{sample}_r2.sorted.bam"
     message: "samtools  sort {input} "
-    threads : 12
+    threads : 6
     shell:
         """
         module load samtools
