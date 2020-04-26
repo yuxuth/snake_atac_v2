@@ -25,6 +25,10 @@ ALL_QC = ["10multiQC/multiQC_log.html"]
 peak = expand("06_peak_macs2_narrow/{sample}_macs2_peaks.narrowPeak", sample = SAMPLES)
 flag_r1 = expand("00_log/{sample}_r1.sorted.bam.flagstat", sample = SAMPLES)
 flag_r2 = expand("00_log/{sample}_r2.sorted.bam.flagstat", sample = SAMPLES)
+index_r1 = expand("03_aln/{sample}_r1.sorted.bam.bai", sample = SAMPLES)
+index_r2 = expand("03_aln/{sample}_r2.sorted.bam.bai", sample = SAMPLES)
+
+"03_aln/{sample}_r1.sorted.bam.bai"
 
 
 TARGETS.extend(bam_r1) ##append all list to 
