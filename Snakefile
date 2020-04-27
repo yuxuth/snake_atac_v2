@@ -96,9 +96,7 @@ rule bowtie2_align_2:
 
 rule updated_r1_sam:
     input:  "03_aln/{sample}_r1.sam"
-    output: temp(sam = "03_aln/{sample}_r1.sam_all", 
-		 head = "03_aln/{sample}_r1.sam_head",
-		bam = "03_aln/{sample}_r1.bam")
+    output: temp(sam = "03_aln/{sample}_r1.sam_all", head = "03_aln/{sample}_r1.sam_head", bam = "03_aln/{sample}_r1.bam")
     shell:
         """
 	module load samtools
@@ -181,7 +179,7 @@ rule flagstat_bam_r2:
 	
 rule call_peaks_macs2_narrow: ## set to large
     input: "03_aln/{sample}_r1.sorted.bam", "03_aln/{sample}_r2.sorted.bam"
-    output: bed = "06_peak_macs2_narrow/{sample}_macs2_peaks.narrowPeak",	
+    output: bed = "06_peak_macs2_narrow/{sample}_macs2_peaks.narrowPeak"	
     log: "00_log/{sample}_call_broad_peaks_macs2.log"
     params:
         name = "{sample}_macs2",
