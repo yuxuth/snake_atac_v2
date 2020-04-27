@@ -102,7 +102,7 @@ rule updated_r1_sam:
 	module load samtools
 	samtools view -H {input} > {output[head]} 
         samtools view -q 30 {input}  | awk '$10 ~ /^AGCTT/' > {output[sam]}
-	cat {output[head]} {output[sam]} | samtools -Sb - >  {output[bam]}
+	cat {output[head]} {output[sam]} | samtools view -Sb - >  {output[bam]}
 	rm -f {output[head]}   {output[sam]}
         """
 	
