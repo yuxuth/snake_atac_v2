@@ -102,7 +102,7 @@ rule updated_r1_sam:
 	module load samtools
         samtools view -q 30 {input}  | awk '$10 ~ /^AGCTT/' > {output[sam]}
 	samtools view -H {input} > {output[head]} 
-	cat {output[head]} {output[sam]} | samtools -Sb >  {output[bam]}
+	cat {output[head]} {output[sam]} | samtools -Sb - >  {output[bam]}
         """
 	
 ## remove the unmapped reads 
