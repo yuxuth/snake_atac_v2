@@ -191,7 +191,7 @@ rule call_peaks_macs2_narrow: ## set to large
        ## for macs2, when nomodel is set, --extsize is default to 200bp, this is the same as 2 * shift-size in macs14.
         macs2 callpeak -t {input[1]} -c  {input[0]} \
             --keep-dup all -f BAM -g hs  --scale-to large  --shift -100 --extsize 200 \
-            --outdir 06_peak_macs2_broad -n {params.name} -p 1e-5  -B --SPMR --nomodel &> {log}
+            --outdir 06_peak_macs2_narrow -n {params.name} -p 1e-5  -B --SPMR --nomodel &> {log}
         """
 
 
