@@ -96,15 +96,17 @@ rule bowtie2_align_2:
 
 rule updated_r1_sam:
     input:  "03_aln/{sample}_r1.sam"
-    output: temp("03_aln/{sample}_r1.bam")
+    output: temp(sam = "03_aln/{sample}_r1.sam_all", 
+		 head = "03_aln/{sample}_r1.sam_head",
+		bam = "03_aln/{sample}_r1.bam")
     shell:
         """
 	module load samtools
-        samtools view -q 30 {input}  \
-	|  awk '$10 ~ /^AGCTT/' \
-	|  samtools view -Sb > {output}
+        samtools view -q 30 {input}  | awk '$10 ~ /^AGCTT/' > {output[sam]}
+	samtools view -H {input} > {output[head]} 
+	cat {output[head]} {output[sam]} | samtools -Sb >  {output[bam]}
         """
-
+	
 ## remove the unmapped reads 
 rule updated_r2_sam:
     input:  "03_aln/{sample}_r2.sam"
