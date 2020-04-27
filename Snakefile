@@ -96,7 +96,7 @@ rule bowtie2_align_2:
 
 rule updated_r1_sam:
     input:  "03_aln/{sample}_r1.sam"
-    output: temp(sam = "03_aln/{sample}_r1.sam_all", head = "03_aln/{sample}_r1.sam_head", bam = "03_aln/{sample}_r1.bam")
+    output: sam = temp("03_aln/{sample}_r1.sam_all"),head = temp("03_aln/{sample}_r1.sam_head"), bam = temp("03_aln/{sample}_r1.bam")
     shell:
         """
 	module load samtools
