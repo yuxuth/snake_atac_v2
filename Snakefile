@@ -17,11 +17,11 @@ TARGETS = []
 ## using Mac2 to call peak and building the signaling track
 
 ## constructe the target if the inputs are fastqs
-ALL_FASTQC_R1  = expand("02_fqc/{sample}_L001_R2_001_fastqc.html", sample = SAMPLES)
+# ALL_FASTQC_R1  = expand("02_fqc/{sample}_L001_R2_001_fastqc.html", sample = SAMPLES)
 bam_r1 = expand("03_aln/{sample}_r1.sorted.bam", sample = SAMPLES)
 # bam_r1_updated = expand("03_aln/{sample}_r1_updated.sorted.bam", sample = SAMPLES)
 bam_r2 = expand("03_aln/{sample}_r2.sorted.bam", sample = SAMPLES)
-ALL_QC = ["10multiQC/multiQC_log.html"]
+# ALL_QC = ["10multiQC/multiQC_log.html"]
 peak = expand("06_peak_macs2_narrow/{sample}_macs2_peaks.narrowPeak", sample = SAMPLES)
 flag_r1 = expand("00_log/{sample}_r1.sorted.bam.flagstat", sample = SAMPLES)
 flag_r2 = expand("00_log/{sample}_r2.sorted.bam.flagstat", sample = SAMPLES)
@@ -101,7 +101,7 @@ rule updated_r1_sam:
         """
 	module load samtools
 	samtools view -H {input} > {output[head]} 
-        samtools view -q 30 {input}  | awk '$10 ~ /^AGCTT/' > {output[sam]}
+        samtools view -q 10 {input}  | awk '$10 ~ /^AGCTT/' > {output[sam]}
 	cat {output[head]} {output[sam]} | samtools view -Sb - >  {output[bam]}
         """
 	
@@ -112,7 +112,7 @@ rule updated_r2_sam:
     shell:
         """
 	module load samtools
-        samtools view -q 30 -Sb {input} >  {output}
+        samtools view -q 10 -Sb {input} >  {output}
         """
 
 rule sort_bam_r1:
