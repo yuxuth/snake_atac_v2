@@ -8,7 +8,7 @@ FILES = json.load(open(config['SAMPLES_JSON']))
 # CLUSTER = json.load(open(config['CLUSTER_JSON']))
 
 SAMPLES = sorted(FILES.keys())
-# BWA_INDEX = config['BWA_INDEX']
+BWA_INDEX = config['BWA_INDEX']
 bowtie2_INDEX = config['bowtie2_INDEX']
 
 TARGETS = []
@@ -74,8 +74,8 @@ rule bowtie2_align_r1:
          "00_log/{sample}_r1.bowtie2"
     shell:
         """
-        module load bowtie2
-        bowtie2  -x {bowtie2_INDEX}  --threads {threads}  -U {input[r1]}  2> {log} \
+        module load bwa
+        bwa mem   -t {threads}  {BWA_INDEX}  {input[r1]}  2> {log} \
 	| samblaster --removeDups  > {output} ## remove the duplicated
         """
 
@@ -89,8 +89,8 @@ rule bowtie2_align_2:
          "00_log/{sample}_r2.bowtie2"
     shell:
         """
-        module load bowtie2
-        bowtie2  -x {bowtie2_INDEX}  --threads {threads}  -U {input[r1]}  2> {log} \
+        module load bwa
+        bwa mem   -t {threads}  {BWA_INDEX}  {input[r1]}   2> {log} \
 	| samblaster --removeDups  > {output}
         """
 
