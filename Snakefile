@@ -33,7 +33,7 @@ index_r2 = expand("03_aln/{sample}_r2.sorted.bam.bai", sample = SAMPLES)
 
 TARGETS.extend(bam_r1) ##append all list to 
 TARGETS.extend(bam_r2)
-TARGETS.extend(ALL_FASTQC_R1) ## check later
+# TARGETS.extend(ALL_FASTQC_R1) ## check later
 # TARGETS.extend(ALL_QC)
 TARGETS.extend(peak)
 TARGETS.extend(flag_r1)
