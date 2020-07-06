@@ -60,7 +60,7 @@ rule bwa_align:
         r1 = lambda wildcards: FILES[wildcards.sample]['R1'],
         r2 = lambda wildcards: FILES[wildcards.sample]['R2']
     output: temp("03_aln/{sample}.sam")
-    threads: 24
+    threads: 12
     message: "bwa {input}: {threads} threads"
     log:
          "00_log/{sample}.bwa"
@@ -140,8 +140,8 @@ rule call_peaks_macs2_narrow:
        module load macs2
        ## for macs2, when nomodel is set, --extsize is default to 200bp, this is the same as 2 * shift-size in macs14.
         macs2 callpeak -t {input[0]} \
-            --keep-dup all -f BAM -g mm \
-            --outdir 06_peak_macs2_broad -n {params.name} -p 1e-5  -B --SPMR --nomodel &> {log}
+            --keep-dup all -f BAM -g hs --shift 75  --extsize 150  \
+            --outdir 06_peak_macs2_broad -n {params.name} -p 0.01  -B --SPMR --nomodel &> {log}
         """
 
 
