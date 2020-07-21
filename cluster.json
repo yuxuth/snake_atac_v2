@@ -6,7 +6,7 @@
         "out": "cluster_log/{rule}.{wildcards.sample}.out",
         "err": "cluster_log/{rule}.{wildcards.sample}.err"
     },
-        "bwa_align":
+        "bowtie2_align":
     {
         "mem": "20G"
     },

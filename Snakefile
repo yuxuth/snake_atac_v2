@@ -22,7 +22,7 @@ bam = expand("03_aln/{sample}.sorted.bam", sample = SAMPLES)
 
 # ALL_QC = ["10multiQC/multiQC_log.html"]
 # peak = expand("06_peak_macs2_broad/{sample}_macs2_peaks.narrowPeak", sample = SAMPLES)
-# flag = expand("00_log/{sample}.sorted.bam.flagstat", sample = SAMPLES)
+flag = expand("00_log/{sample}.sorted.bam.flagstat", sample = SAMPLES)
 bam_index = expand("03_aln/{sample}.sorted.bam.bai", sample = SAMPLES)
 TARGETS.extend(bam) ##append all list to 
 TARGETS.extend(flag)
@@ -37,7 +37,7 @@ rule all:
 
 
 
-rule bwa_align:
+rule bowtie2_align:
     input:
         r1 = lambda wildcards: FILES[wildcards.sample]['R1'], #,
         r2 = lambda wildcards: FILES[wildcards.sample]['R2']
@@ -45,11 +45,11 @@ rule bwa_align:
     threads: 12
     message: "bwa {input}: {threads} threads"
     log:
-         "00_log/{sample}.bwa"
+         "00_log/{sample}.bowtie2"
     shell:
         """
         module load bowtie2
-        bowtie2 --mm -x {bowtie2_INDEX}  -X 2000 --threads {threads}  -1 {input[0]}  -2 {input[1]} > {output}  2> {log}
+        bowtie2  -x {bowtie2_INDEX}  -X 2000 --threads {threads}  -1 {input[0]}  -2 {input[1]} > {output}  2> {log}
         """
 
 

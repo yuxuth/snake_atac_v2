@@ -1,6 +1,6 @@
 
 BWA_INDEX: /home/gb148/almanlab/genome_ref/Mus_musculus/UCSC/mm10/Sequence/BWAIndex/genome.fa
-bowtie2_INDEX: ~/data/Index/hg19_botiw2_index/hg19
+bowtie2_INDEX: ~/data/Index/hg19_botiw2_index/hg19.fa
 macs_g: hs
 macs_pvalue: 1e-5
 macs2_g: hs
